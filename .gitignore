@@ -1,0 +1,30 @@
+# Build artifacts (.NET)
+bin/
+obj/
+*.user
+*.suo
+
+# Visual Studio
+.vs/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# NuGet
+packages/
+*.nupkg
+
+# Testes
+TestResults/
+
+# Banco de dados local (SQLite) — não versionar dados locais de desenvolvimento
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Sistema operacional
+Thumbs.db
+.DS_Store
