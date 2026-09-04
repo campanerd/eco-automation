@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ECO.Application/ECO.Application.csproj" />
+    <Project Path="src/ECO.Domain/ECO.Domain.csproj" />
+    <Project Path="src/ECO.Infrastructure/ECO.Infrastructure.csproj" />
+    <Project Path="src/ECO.Presentation.WPF/ECO.Presentation.WPF.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ECO.Application.Tests/ECO.Application.Tests.csproj" />
+    <Project Path="tests/ECO.Domain.Tests/ECO.Domain.Tests.csproj" />
+  </Folder>
+</Solution>
