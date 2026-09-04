@@ -10,6 +10,8 @@ obj/
 # JetBrains Rider
 .idea/
 *.sln.iml
+*.DotSettings.user
+*.rsuser
 
 # NuGet
 packages/
@@ -17,6 +19,10 @@ packages/
 
 # Testes
 TestResults/
+*.trx
+
+# Logs de build
+*.binlog
 
 # Banco de dados local (SQLite) — não versionar dados locais de desenvolvimento
 *.db
@@ -28,3 +34,7 @@ TestResults/
 # Sistema operacional
 Thumbs.db
 .DS_Store
+
+# Claude Code (configuração local, não versionada)
+/.claude
+CLAUDE.md
