@@ -1,0 +1,32 @@
+Table macro {
+  id integer [primary key]
+  name text [not null]
+}
+
+Table macro_step {
+  id integer [primary key]
+  macro_id integer [not null]
+  step_order integer [not null]
+  delay_before_ms integer [not null]
+  step_type text [not null, note: 'Click, KeyPress, TypeText, TypeVariableText, Wait']
+  x integer
+  y integer
+  key_name text
+  text text
+  duration_ms integer
+
+  note: 'Colunas x/y/key_name/text/duration_ms são nullable — só a combinação certa é preenchida conforme step_type'
+}
+
+Table schedule {
+  id integer [primary key]
+  macro_id integer [not null]
+  scheduled_at datetime
+  recurrence_rule text
+  is_active boolean [not null, default: true]
+
+  note: 'recurrence_rule ainda depende de fechar Quartz.NET (cron) vs. Timer nativo'
+}
+
+Ref: macro_step.macro_id > macro.id
+Ref: schedule.macro_id > macro.id
