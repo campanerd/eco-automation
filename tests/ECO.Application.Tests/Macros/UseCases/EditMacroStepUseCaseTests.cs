@@ -2,6 +2,7 @@ using ECO.Application.Macros.Abstractions;
 using ECO.Application.Macros.UseCases;
 using ECO.Domain.Macros;
 using ECO.Domain.Macros.Steps;
+
 using NSubstitute;
 
 namespace ECO.Application.Tests.Macros.UseCases;
@@ -39,8 +40,8 @@ public class EditMacroStepUseCaseTests
         _repository.GetByIdAsync(99).Returns((Macro?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _useCase.UpdateDelayAsync(macroId: 99, stepId: 1, newDelayBeforeMs: 0));
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _useCase.UpdateDelayAsync(macroId: 99, stepId: 1, newDelayBeforeMs: 0));
     }
 
     [Fact(DisplayName = "Passo inexistente na macro lança exceção e não salva")]
@@ -51,8 +52,8 @@ public class EditMacroStepUseCaseTests
         _repository.GetByIdAsync(1).Returns(macro);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(
-            () => _useCase.UpdateDelayAsync(macroId: 1, stepId: 999, newDelayBeforeMs: 0));
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            _useCase.UpdateDelayAsync(macroId: 1, stepId: 999, newDelayBeforeMs: 0));
         await _repository.DidNotReceive().UpdateAsync(Arg.Any<Macro>());
     }
 }

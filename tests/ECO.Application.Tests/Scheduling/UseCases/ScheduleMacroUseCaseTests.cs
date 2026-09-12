@@ -1,6 +1,7 @@
 using ECO.Application.Scheduling.Abstractions;
 using ECO.Application.Scheduling.UseCases;
 using ECO.Domain.Scheduling;
+
 using NSubstitute;
 
 namespace ECO.Application.Tests.Scheduling.UseCases;

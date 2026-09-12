@@ -2,6 +2,7 @@ using ECO.Application.Macros.Abstractions;
 using ECO.Application.Macros.UseCases;
 using ECO.Domain.Macros;
 using ECO.Domain.Macros.Steps;
+
 using NSubstitute;
 
 namespace ECO.Application.Tests.Macros.UseCases;

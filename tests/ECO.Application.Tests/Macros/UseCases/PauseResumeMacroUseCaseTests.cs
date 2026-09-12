@@ -1,5 +1,6 @@
 using ECO.Application.Macros.Abstractions;
 using ECO.Application.Macros.UseCases;
+
 using NSubstitute;
 
 namespace ECO.Application.Tests.Macros.UseCases;
