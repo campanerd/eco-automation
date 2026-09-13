@@ -1,8 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-        <ProjectReference Include="..\ECO.Domain\ECO.Domain.csproj"/>
-        <ProjectReference Include="..\ECO.Application\ECO.Application.csproj"/>
+        <ProjectReference Include="..\ECO.Domain\ECO.Domain.csproj" />
+        <ProjectReference Include="..\ECO.Application\ECO.Application.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Dapper" Version="2.1.86" />
+      <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
     </ItemGroup>
 
     <PropertyGroup>
