@@ -11,22 +11,6 @@ public class WindowsInputPlayer : IInputPlayer
 {
     private const int PauseCheckIntervalMs = 100;
 
-    private static readonly Dictionary<string, ushort> NamedKeys = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["Enter"] = 0x0D,
-        ["Tab"] = 0x09,
-        ["Escape"] = 0x1B,
-        ["Backspace"] = 0x08,
-        ["Delete"] = 0x2E,
-        ["Space"] = 0x20,
-        ["Up"] = 0x26,
-        ["Down"] = 0x28,
-        ["Left"] = 0x25,
-        ["Right"] = 0x27,
-        ["Home"] = 0x24,
-        ["End"] = 0x23,
-    };
-
     private volatile bool _isPaused;
 
     public async Task PlayAsync(IReadOnlyList<MacroStep> steps, CancellationToken cancellationToken = default)
@@ -121,7 +105,7 @@ public class WindowsInputPlayer : IInputPlayer
 
     private static void PressNamedKey(string key)
     {
-        if (!NamedKeys.TryGetValue(key, out var virtualKeyCode))
+        if (!NamedVirtualKeys.ByName.TryGetValue(key, out var virtualKeyCode))
             throw new NotSupportedException($"Tecla não suportada: '{key}'.");
 
         INPUT[] inputs =
