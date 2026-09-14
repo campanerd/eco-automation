@@ -11,11 +11,7 @@ public class RecordMacroUseCase(IInputRecorder recorder, IMacroRepository reposi
     {
         var steps = recorder.Stop();
 
-        var macro = new Macro
-        {
-            Name = macroName,
-            Steps = [.. steps],
-        };
+        var macro = new Macro { Name = macroName, Steps = [.. steps], };
 
         await repository.AddAsync(macro);
 

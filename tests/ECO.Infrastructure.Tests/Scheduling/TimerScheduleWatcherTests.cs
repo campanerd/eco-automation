@@ -20,7 +20,10 @@ public class TimerScheduleWatcherTests
     {
         // Arrange
         _timeProvider.Now = new DateTimeOffset(2026, 9, 15, 10, 0, 0, TimeSpan.Zero);
-        var schedule = new Schedule { Id = 1, MacroId = 42, ScheduledAt = new DateTime(2026, 9, 15, 9, 0, 0), IsActive = true };
+        var schedule = new Schedule
+        {
+            Id = 1, MacroId = 42, ScheduledAt = new DateTime(2026, 9, 15, 9, 0, 0), IsActive = true
+        };
         _scheduleRepository.GetAllAsync().Returns(new List<Schedule> { schedule });
 
         // Act
@@ -37,7 +40,10 @@ public class TimerScheduleWatcherTests
     {
         // Arrange
         _timeProvider.Now = new DateTimeOffset(2026, 9, 15, 8, 0, 0, TimeSpan.Zero);
-        var schedule = new Schedule { Id = 1, MacroId = 42, ScheduledAt = new DateTime(2026, 9, 15, 9, 0, 0), IsActive = true };
+        var schedule = new Schedule
+        {
+            Id = 1, MacroId = 42, ScheduledAt = new DateTime(2026, 9, 15, 9, 0, 0), IsActive = true
+        };
         _scheduleRepository.GetAllAsync().Returns(new List<Schedule> { schedule });
 
         // Act
@@ -52,7 +58,10 @@ public class TimerScheduleWatcherTests
     {
         // Arrange
         _timeProvider.Now = new DateTimeOffset(2026, 9, 15, 10, 0, 0, TimeSpan.Zero);
-        var schedule = new Schedule { Id = 1, MacroId = 42, ScheduledAt = new DateTime(2026, 9, 15, 9, 0, 0), IsActive = false };
+        var schedule = new Schedule
+        {
+            Id = 1, MacroId = 42, ScheduledAt = new DateTime(2026, 9, 15, 9, 0, 0), IsActive = false
+        };
         _scheduleRepository.GetAllAsync().Returns(new List<Schedule> { schedule });
 
         // Act
@@ -62,7 +71,8 @@ public class TimerScheduleWatcherTests
         await _playMacroUseCase.DidNotReceiveWithAnyArgs().PlayAsync(default, default);
     }
 
-    [Fact(DisplayName = "Agendamento recorrente dispara quando o horário do cron cai entre a última checagem e agora, e continua ativo")]
+    [Fact(DisplayName =
+        "Agendamento recorrente dispara quando o horário do cron cai entre a última checagem e agora, e continua ativo")]
     public async Task CheckSchedulesAsync_RecurringDue_FiresAndStaysActive()
     {
         // Arrange — o construtor já usa esse "agora" pra semear a última checagem em 08:59

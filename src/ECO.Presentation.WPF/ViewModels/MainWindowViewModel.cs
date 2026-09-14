@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+
 using ECO.Application.Macros.Abstractions;
 using ECO.Application.Macros.UseCases;
 
@@ -12,8 +14,7 @@ public partial class MainWindowViewModel(
     IPlayMacroUseCase playMacroUseCase,
     PauseResumeMacroUseCase pauseResumeMacroUseCase) : ObservableObject
 {
-    [ObservableProperty]
-    private string _newMacroName = "";
+    [ObservableProperty] private string _newMacroName = "";
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(StartRecordingCommand))]
@@ -25,15 +26,12 @@ public partial class MainWindowViewModel(
     [NotifyCanExecuteChangedFor(nameof(PlayMacroCommand))]
     private bool _isPlaying;
 
-    [ObservableProperty]
-    private bool _isPaused;
+    [ObservableProperty] private bool _isPaused;
 
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(PlayMacroCommand))]
+    [ObservableProperty] [NotifyCanExecuteChangedFor(nameof(PlayMacroCommand))]
     private MacroListItem? _selectedMacro;
 
-    [ObservableProperty]
-    private string _statusMessage = "";
+    [ObservableProperty] private string _statusMessage = "";
 
     public ObservableCollection<MacroListItem> Macros { get; } = [];
 

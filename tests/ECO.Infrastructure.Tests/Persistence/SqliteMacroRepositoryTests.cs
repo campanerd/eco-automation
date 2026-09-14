@@ -112,8 +112,7 @@ public class SqliteMacroRepositoryTests : IDisposable
         // Arrange
         var macro = new Macro
         {
-            Name = "Original",
-            Steps = [new WaitStep { Order = 1, DelayBeforeMs = 5000, DurationMs = 1000 }],
+            Name = "Original", Steps = [new WaitStep { Order = 1, DelayBeforeMs = 5000, DurationMs = 1000 }],
         };
         await _repository.AddAsync(macro);
 
@@ -136,8 +135,7 @@ public class SqliteMacroRepositoryTests : IDisposable
         // Arrange
         var macro = new Macro
         {
-            Name = "Pra apagar",
-            Steps = [new WaitStep { Order = 1, DelayBeforeMs = 0, DurationMs = 100 }],
+            Name = "Pra apagar", Steps = [new WaitStep { Order = 1, DelayBeforeMs = 0, DurationMs = 100 }],
         };
         await _repository.AddAsync(macro);
 
@@ -153,7 +151,10 @@ public class SqliteMacroRepositoryTests : IDisposable
     public async Task GetAllAsync_ReturnsAllMacrosWithTheirOwnSteps()
     {
         // Arrange
-        var macroA = new Macro { Name = "A", Steps = [new WaitStep { Order = 1, DelayBeforeMs = 0, DurationMs = 100 }] };
+        var macroA = new Macro
+        {
+            Name = "A", Steps = [new WaitStep { Order = 1, DelayBeforeMs = 0, DurationMs = 100 }]
+        };
         var macroB = new Macro { Name = "B", Steps = [new ClickStep { Order = 1, DelayBeforeMs = 0, X = 1, Y = 1 }] };
         await _repository.AddAsync(macroA);
         await _repository.AddAsync(macroB);

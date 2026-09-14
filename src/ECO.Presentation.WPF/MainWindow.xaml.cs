@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
+
 using ECO.Presentation.WPF.ViewModels;
 
 namespace ECO.Presentation.WPF;
@@ -40,9 +41,11 @@ public partial class MainWindow : Window
                 _viewModel.TogglePause);
 
             if (!_stopRecordingHotkey.IsRegistered)
-                viewModel.StatusMessage = "Atenção: não consegui registrar Ctrl+Alt+R (outro programa já usa esse atalho).";
+                viewModel.StatusMessage =
+                    "Atenção: não consegui registrar Ctrl+Alt+R (outro programa já usa esse atalho).";
             else if (!_togglePauseHotkey.IsRegistered)
-                viewModel.StatusMessage = "Atenção: não consegui registrar Ctrl+Alt+Pause (outro programa já usa esse atalho).";
+                viewModel.StatusMessage =
+                    "Atenção: não consegui registrar Ctrl+Alt+Pause (outro programa já usa esse atalho).";
 
             await viewModel.LoadMacrosCommand.ExecuteAsync(null);
         };

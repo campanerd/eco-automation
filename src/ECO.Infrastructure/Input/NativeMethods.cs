@@ -63,7 +63,8 @@ internal static class NativeMethods
         uint wVirtKey,
         uint wScanCode,
         byte[] lpKeyState,
-        [Out, MarshalAs(UnmanagedType.LPWStr, SizeParamIndex = 4)] StringBuilder pwszBuff,
+        [Out, MarshalAs(UnmanagedType.LPWStr, SizeParamIndex = 4)]
+        StringBuilder pwszBuff,
         int cchBuff,
         uint wFlags);
 
@@ -77,11 +78,9 @@ internal static class NativeMethods
     [StructLayout(LayoutKind.Explicit)]
     public struct InputUnion
     {
-        [FieldOffset(0)]
-        public MOUSEINPUT mi;
+        [FieldOffset(0)] public MOUSEINPUT mi;
 
-        [FieldOffset(0)]
-        public KEYBDINPUT ki;
+        [FieldOffset(0)] public KEYBDINPUT ki;
     }
 
     [StructLayout(LayoutKind.Sequential)]

@@ -40,7 +40,8 @@ public class SqliteMacroRepository(string connectionString) : IMacroRepository
         using var connection = new SqliteConnection(connectionString);
 
         var macroRows = await connection.QueryAsync<MacroRow>("SELECT id, name FROM macro");
-        var stepRows = (await connection.QueryAsync<MacroStepRow>($"{StepSelectSql} ORDER BY macro_id, step_order")).ToList();
+        var stepRows = (await connection.QueryAsync<MacroStepRow>($"{StepSelectSql} ORDER BY macro_id, step_order"))
+            .ToList();
 
         return [.. macroRows.Select(macroRow => MapMacro(macroRow, stepRows.Where(s => s.MacroId == macroRow.Id)))];
     }
@@ -107,28 +108,103 @@ public class SqliteMacroRepository(string connectionString) : IMacroRepository
 
     private static Macro MapMacro(MacroRow macroRow, IEnumerable<MacroStepRow> stepRows) => new()
     {
-        Id = macroRow.Id,
-        Name = macroRow.Name,
-        Steps = [.. stepRows.Select(MapStep)],
+        Id = macroRow.Id, Name = macroRow.Name, Steps = [.. stepRows.Select(MapStep)],
     };
 
     private static MacroStep MapStep(MacroStepRow row) => row.StepType switch
     {
-        "Click" => new ClickStep { Id = row.Id, Order = row.StepOrder, DelayBeforeMs = row.DelayBeforeMs, X = row.X!.Value, Y = row.Y!.Value },
-        "KeyPress" => new KeyPressStep { Id = row.Id, Order = row.StepOrder, DelayBeforeMs = row.DelayBeforeMs, Key = row.KeyName! },
-        "TypeText" => new TypeTextStep { Id = row.Id, Order = row.StepOrder, DelayBeforeMs = row.DelayBeforeMs, Text = row.Text! },
-        "TypeVariableText" => new TypeVariableTextStep { Id = row.Id, Order = row.StepOrder, DelayBeforeMs = row.DelayBeforeMs, Text = row.Text! },
-        "Wait" => new WaitStep { Id = row.Id, Order = row.StepOrder, DelayBeforeMs = row.DelayBeforeMs, DurationMs = row.DurationMs!.Value },
+        "Click" => new ClickStep
+        {
+            Id = row.Id,
+            Order = row.StepOrder,
+            DelayBeforeMs = row.DelayBeforeMs,
+            X = row.X!.Value,
+            Y = row.Y!.Value
+        },
+        "KeyPress" => new KeyPressStep
+        {
+            Id = row.Id, Order = row.StepOrder, DelayBeforeMs = row.DelayBeforeMs, Key = row.KeyName!
+        },
+        "TypeText" => new TypeTextStep
+        {
+            Id = row.Id, Order = row.StepOrder, DelayBeforeMs = row.DelayBeforeMs, Text = row.Text!
+        },
+        "TypeVariableText" => new TypeVariableTextStep
+        {
+            Id = row.Id, Order = row.StepOrder, DelayBeforeMs = row.DelayBeforeMs, Text = row.Text!
+        },
+        "Wait" => new WaitStep
+        {
+            Id = row.Id,
+            Order = row.StepOrder,
+            DelayBeforeMs = row.DelayBeforeMs,
+            DurationMs = row.DurationMs!.Value
+        },
         _ => throw new InvalidOperationException($"Tipo de step desconhecido: '{row.StepType}'."),
     };
 
     private static object ToParameters(MacroStep step, int macroId) => step switch
     {
-        ClickStep s => new { MacroId = macroId, StepOrder = s.Order, s.DelayBeforeMs, StepType = "Click", s.X, s.Y, KeyName = (string?)null, Text = (string?)null, DurationMs = (int?)null },
-        KeyPressStep s => new { MacroId = macroId, StepOrder = s.Order, s.DelayBeforeMs, StepType = "KeyPress", X = (int?)null, Y = (int?)null, KeyName = s.Key, Text = (string?)null, DurationMs = (int?)null },
-        TypeTextStep s => new { MacroId = macroId, StepOrder = s.Order, s.DelayBeforeMs, StepType = "TypeText", X = (int?)null, Y = (int?)null, KeyName = (string?)null, s.Text, DurationMs = (int?)null },
-        TypeVariableTextStep s => new { MacroId = macroId, StepOrder = s.Order, s.DelayBeforeMs, StepType = "TypeVariableText", X = (int?)null, Y = (int?)null, KeyName = (string?)null, s.Text, DurationMs = (int?)null },
-        WaitStep s => new { MacroId = macroId, StepOrder = s.Order, s.DelayBeforeMs, StepType = "Wait", X = (int?)null, Y = (int?)null, KeyName = (string?)null, Text = (string?)null, s.DurationMs },
+        ClickStep s => new
+        {
+            MacroId = macroId,
+            StepOrder = s.Order,
+            s.DelayBeforeMs,
+            StepType = "Click",
+            s.X,
+            s.Y,
+            KeyName = (string?)null,
+            Text = (string?)null,
+            DurationMs = (int?)null
+        },
+        KeyPressStep s => new
+        {
+            MacroId = macroId,
+            StepOrder = s.Order,
+            s.DelayBeforeMs,
+            StepType = "KeyPress",
+            X = (int?)null,
+            Y = (int?)null,
+            KeyName = s.Key,
+            Text = (string?)null,
+            DurationMs = (int?)null
+        },
+        TypeTextStep s => new
+        {
+            MacroId = macroId,
+            StepOrder = s.Order,
+            s.DelayBeforeMs,
+            StepType = "TypeText",
+            X = (int?)null,
+            Y = (int?)null,
+            KeyName = (string?)null,
+            s.Text,
+            DurationMs = (int?)null
+        },
+        TypeVariableTextStep s => new
+        {
+            MacroId = macroId,
+            StepOrder = s.Order,
+            s.DelayBeforeMs,
+            StepType = "TypeVariableText",
+            X = (int?)null,
+            Y = (int?)null,
+            KeyName = (string?)null,
+            s.Text,
+            DurationMs = (int?)null
+        },
+        WaitStep s => new
+        {
+            MacroId = macroId,
+            StepOrder = s.Order,
+            s.DelayBeforeMs,
+            StepType = "Wait",
+            X = (int?)null,
+            Y = (int?)null,
+            KeyName = (string?)null,
+            Text = (string?)null,
+            s.DurationMs
+        },
         _ => throw new InvalidOperationException($"Tipo de MacroStep desconhecido: {step.GetType().Name}."),
     };
 

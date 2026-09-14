@@ -101,8 +101,14 @@ public class WindowsInputPlayer : IInputPlayer
     {
         INPUT[] inputs =
         [
-            new INPUT { type = INPUT_MOUSE, U = new InputUnion { mi = new MOUSEINPUT { dwFlags = MOUSEEVENTF_LEFTDOWN } } },
-            new INPUT { type = INPUT_MOUSE, U = new InputUnion { mi = new MOUSEINPUT { dwFlags = MOUSEEVENTF_LEFTUP } } },
+            new INPUT
+            {
+                type = INPUT_MOUSE, U = new InputUnion { mi = new MOUSEINPUT { dwFlags = MOUSEEVENTF_LEFTDOWN } }
+            },
+            new INPUT
+            {
+                type = INPUT_MOUSE, U = new InputUnion { mi = new MOUSEINPUT { dwFlags = MOUSEEVENTF_LEFTUP } }
+            },
         ];
 
         SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<INPUT>());
@@ -116,7 +122,11 @@ public class WindowsInputPlayer : IInputPlayer
         INPUT[] inputs =
         [
             new INPUT { type = INPUT_KEYBOARD, U = new InputUnion { ki = new KEYBDINPUT { wVk = virtualKeyCode } } },
-            new INPUT { type = INPUT_KEYBOARD, U = new InputUnion { ki = new KEYBDINPUT { wVk = virtualKeyCode, dwFlags = KEYEVENTF_KEYUP } } },
+            new INPUT
+            {
+                type = INPUT_KEYBOARD,
+                U = new InputUnion { ki = new KEYBDINPUT { wVk = virtualKeyCode, dwFlags = KEYEVENTF_KEYUP } }
+            },
         ];
 
         SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<INPUT>());
@@ -128,8 +138,19 @@ public class WindowsInputPlayer : IInputPlayer
         {
             INPUT[] inputs =
             [
-                new INPUT { type = INPUT_KEYBOARD, U = new InputUnion { ki = new KEYBDINPUT { wScan = character, dwFlags = KEYEVENTF_UNICODE } } },
-                new INPUT { type = INPUT_KEYBOARD, U = new InputUnion { ki = new KEYBDINPUT { wScan = character, dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP } } },
+                new INPUT
+                {
+                    type = INPUT_KEYBOARD,
+                    U = new InputUnion { ki = new KEYBDINPUT { wScan = character, dwFlags = KEYEVENTF_UNICODE } }
+                },
+                new INPUT
+                {
+                    type = INPUT_KEYBOARD,
+                    U = new InputUnion
+                    {
+                        ki = new KEYBDINPUT { wScan = character, dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP }
+                    }
+                },
             ];
 
             SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<INPUT>());
