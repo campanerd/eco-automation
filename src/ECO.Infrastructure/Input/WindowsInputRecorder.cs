@@ -92,15 +92,24 @@ public class WindowsInputRecorder : IInputRecorder
         // O resto (letras, números, pontuação, espaço) vai se acumulando num buffer de texto,
         // em vez de virar um KeyPressStep por tecla — só quando uma tecla nomeada aparece,
         // ou a gravação para, esse buffer inteiro vira um único TypeTextStep.
-        // Caracteres de controle são descartados: combinações como Ctrl+R (o atalho que para a
-        // gravação) traduzem para um caractere invisível que não faz sentido dentro de um texto.
         var character = TranslateToChar(virtualKeyCode);
         if (character is not null && !char.IsControl(character.Value))
             _textBuffer.Append(character.Value);
     }
 
+    private const int VK_CONTROL = 0x11;
+    private const int VK_MENU = 0x12; // Alt
+
     private static char? TranslateToChar(uint virtualKeyCode)
     {
+        // Ctrl/Alt pressionados = atalho, nunca texto (GetAsyncKeyState, não GetKeyboardState,
+        // que fica desatualizado dentro de um hook de baixo nível).
+        var isControlDown = GetAsyncKeyState(VK_CONTROL) < 0;
+        var isAltDown = GetAsyncKeyState(VK_MENU) < 0;
+
+        if (isControlDown || isAltDown)
+            return null;
+
         var keyboardState = new byte[256];
         if (!GetKeyboardState(keyboardState))
             return null;

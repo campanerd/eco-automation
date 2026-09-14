@@ -59,6 +59,9 @@ internal static class NativeMethods
     public static extern bool GetKeyboardState(byte[] lpKeyState);
 
     [DllImport("user32.dll")]
+    public static extern short GetAsyncKeyState(int vKey);
+
+    [DllImport("user32.dll")]
     public static extern int ToUnicode(
         uint wVirtKey,
         uint wScanCode,
