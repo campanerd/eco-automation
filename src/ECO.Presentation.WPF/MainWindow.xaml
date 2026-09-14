@@ -5,11 +5,34 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ECO.Presentation.WPF"
         mc:Ignorable="d"
-        Title="ECO — Minhas macros" Height="450" Width="800">
+        Title="ECO — Minhas macros" Height="500" Width="800">
     <DockPanel Margin="16">
         <TextBlock DockPanel.Dock="Top"
                    Text="Minhas macros"
                    FontSize="20"
+                   Margin="0,0,0,12" />
+
+        <StackPanel DockPanel.Dock="Top"
+                    Orientation="Horizontal"
+                    Margin="0,0,0,8">
+            <TextBlock Text="Nome da nova macro:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,8,0" />
+
+            <TextBox Text="{Binding NewMacroName, UpdateSourceTrigger=PropertyChanged}"
+                     Width="280"
+                     Padding="4"
+                     VerticalContentAlignment="Center" />
+
+            <Button Content="Gravar nova macro"
+                    Command="{Binding StartRecordingCommand}"
+                    Padding="12,6"
+                    Margin="8,0,0,0" />
+        </StackPanel>
+
+        <TextBlock DockPanel.Dock="Top"
+                   Text="{Binding StatusMessage}"
+                   Foreground="#555"
                    Margin="0,0,0,12" />
 
         <StackPanel DockPanel.Dock="Bottom"
