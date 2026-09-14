@@ -2,7 +2,7 @@ using ECO.Application.Macros.Abstractions;
 
 namespace ECO.Application.Macros.UseCases;
 
-public class PlayMacroUseCase(IMacroRepository repository, IInputPlayer player)
+public class PlayMacroUseCase(IMacroRepository repository, IInputPlayer player) : IPlayMacroUseCase
 {
     public async Task PlayAsync(int macroId, CancellationToken cancellationToken = default)
     {
