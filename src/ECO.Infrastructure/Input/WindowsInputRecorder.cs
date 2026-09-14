@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -78,14 +79,28 @@ public class WindowsInputRecorder : IInputRecorder
         return CallNextHookEx(0, code, wParam, lParam);
     }
 
+    // Ctrl+Alt+R (parar gravação) e Ctrl+Alt+P (pausar/retomar) são atalhos globais do app (ver
+    // GlobalHotkey na WPF) — chegam aqui também pelo hook, mas não podem virar um passo.
+    private static readonly uint[] ReservedShortcutKeys = [0x52, 0x50]; // R, P
+
     private void HandleKeyDown(uint virtualKeyCode)
     {
+        var isControlDown = GetAsyncKeyState(VK_CONTROL) < 0;
+        var isShiftDown = GetAsyncKeyState(VK_SHIFT) < 0;
+        var isAltDown = GetAsyncKeyState(VK_MENU) < 0;
+
         // Teclas nomeadas (Enter, Tab, setas...) não têm caractere visível — viram um
-        // KeyPressStep próprio, e primeiro fecham qualquer texto que estivesse sendo acumulado.
+        // KeyPressStep próprio, já incluindo os modificadores (ex.: Ctrl+Shift+Right p/ selecionar).
         if (NamedVirtualKeys.ByCode.TryGetValue((ushort)virtualKeyCode, out var name))
         {
             FlushTextBuffer();
-            AddStep(new KeyPressStep { Key = name });
+            AddStep(new KeyPressStep { Key = BuildKeyName(isControlDown, isShiftDown, isAltDown, name) });
+            return;
+        }
+
+        if (isControlDown || isAltDown)
+        {
+            HandleShortcut(virtualKeyCode, isControlDown, isShiftDown, isAltDown);
             return;
         }
 
@@ -97,19 +112,30 @@ public class WindowsInputRecorder : IInputRecorder
             _textBuffer.Append(character.Value);
     }
 
-    private const int VK_CONTROL = 0x11;
-    private const int VK_MENU = 0x12; // Alt
+    // Atalho tipo Ctrl+S ou Ctrl+Shift+Z: vira um KeyPressStep com nome "Ctrl+S"/"Ctrl+Shift+Z",
+    // em vez de ser digitado ou simplesmente ignorado.
+    private void HandleShortcut(uint virtualKeyCode, bool isControlDown, bool isShiftDown, bool isAltDown)
+    {
+        if (isControlDown && isAltDown && ReservedShortcutKeys.Contains(virtualKeyCode))
+            return;
+
+        var letter = VirtualKeyToLetterOrDigit(virtualKeyCode);
+        if (letter is null)
+            return;
+
+        FlushTextBuffer();
+        AddStep(new KeyPressStep { Key = BuildKeyName(isControlDown, isShiftDown, isAltDown, letter) });
+    }
+
+    private static string BuildKeyName(bool isControlDown, bool isShiftDown, bool isAltDown, string baseName) =>
+        (isControlDown ? "Ctrl+" : "") + (isShiftDown ? "Shift+" : "") + (isAltDown ? "Alt+" : "") + baseName;
+
+    // VK_0-VK_9 e VK_A-VK_Z coincidem com os códigos ASCII de '0'-'9' e 'A'-'Z' (garantia da API do Windows).
+    private static string? VirtualKeyToLetterOrDigit(uint virtualKeyCode) =>
+        virtualKeyCode is (>= 0x30 and <= 0x39) or (>= 0x41 and <= 0x5A) ? ((char)virtualKeyCode).ToString() : null;
 
     private static char? TranslateToChar(uint virtualKeyCode)
     {
-        // Ctrl/Alt pressionados = atalho, nunca texto (GetAsyncKeyState, não GetKeyboardState,
-        // que fica desatualizado dentro de um hook de baixo nível).
-        var isControlDown = GetAsyncKeyState(VK_CONTROL) < 0;
-        var isAltDown = GetAsyncKeyState(VK_MENU) < 0;
-
-        if (isControlDown || isAltDown)
-            return null;
-
         var keyboardState = new byte[256];
         if (!GetKeyboardState(keyboardState))
             return null;

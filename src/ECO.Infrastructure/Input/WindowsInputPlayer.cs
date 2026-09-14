@@ -11,10 +11,10 @@ public class WindowsInputPlayer : IInputPlayer
 {
     private const int PauseCheckIntervalMs = 100;
 
-    // Sem essa pausa, as teclas de um texto longo saem rápido demais e o programa de destino
-    // (o Bloco de Notas novo do Windows 11, por exemplo) descarta parte delas silenciosamente —
-    // SendInput não avisa quando isso acontece, então o sintoma é texto cortado, sem erro nenhum.
-    private const int InterCharacterDelayMs = 15;
+    // Sem essa pausa, eventos de teclado saem rápido demais e o programa de destino descarta
+    // parte deles silenciosamente (texto cortado no Bloco de Notas, Ctrl+V ignorado num navegador) —
+    // SendInput não avisa quando isso acontece.
+    private const int KeyEventDelayMs = 15;
 
     private volatile bool _isPaused;
 
@@ -32,7 +32,7 @@ public class WindowsInputPlayer : IInputPlayer
                     break;
 
                 case KeyPressStep keyPress:
-                    PressNamedKey(keyPress.Key);
+                    await PressNamedKeyAsync(keyPress.Key, cancellationToken);
                     break;
 
                 case TypeTextStep typeText:
@@ -114,22 +114,68 @@ public class WindowsInputPlayer : IInputPlayer
         SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<INPUT>());
     }
 
-    private static void PressNamedKey(string key)
+    // Suporta tanto uma tecla nomeada sozinha ("Enter") quanto um atalho ("Ctrl+S", "Ctrl+Shift+Z"):
+    // pressiona cada parte em ordem e solta na ordem inversa, como um usuário faria. Um pequeno
+    // delay entre cada evento evita que o atalho seja perdido no app de destino (ex.: Ctrl+V num navegador).
+    private static async Task PressNamedKeyAsync(string key, CancellationToken cancellationToken)
     {
-        if (!NamedVirtualKeys.ByName.TryGetValue(key, out var virtualKeyCode))
-            throw new NotSupportedException($"Tecla não suportada: '{key}'.");
+        var codes = key.Split('+').Select(ResolveVirtualKey).ToArray();
 
-        INPUT[] inputs =
-        [
-            new INPUT { type = INPUT_KEYBOARD, U = new InputUnion { ki = new KEYBDINPUT { wVk = virtualKeyCode } } },
-            new INPUT
-            {
-                type = INPUT_KEYBOARD,
-                U = new InputUnion { ki = new KEYBDINPUT { wVk = virtualKeyCode, dwFlags = KEYEVENTF_KEYUP } }
-            },
-        ];
+        foreach (var code in codes)
+        {
+            SendInput(1, [KeyInput(code, isKeyUp: false)], Marshal.SizeOf<INPUT>());
+            await Task.Delay(KeyEventDelayMs, cancellationToken);
+        }
 
-        SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<INPUT>());
+        foreach (var code in codes.Reverse())
+        {
+            SendInput(1, [KeyInput(code, isKeyUp: true)], Marshal.SizeOf<INPUT>());
+            await Task.Delay(KeyEventDelayMs, cancellationToken);
+        }
+    }
+
+    private static ushort ResolveVirtualKey(string name)
+    {
+        if (name.Equals("Ctrl", StringComparison.OrdinalIgnoreCase))
+            return VK_CONTROL;
+
+        if (name.Equals("Shift", StringComparison.OrdinalIgnoreCase))
+            return VK_SHIFT;
+
+        if (name.Equals("Alt", StringComparison.OrdinalIgnoreCase))
+            return VK_MENU;
+
+        if (NamedVirtualKeys.ByName.TryGetValue(name, out var code))
+            return code;
+
+        // VK_0-VK_9 e VK_A-VK_Z coincidem com os códigos ASCII de '0'-'9' e 'A'-'Z'.
+        if (name.Length == 1)
+            return char.ToUpperInvariant(name[0]);
+
+        throw new NotSupportedException($"Tecla não suportada: '{name}'.");
+    }
+
+    // Setas, Home/End, Delete e as teclas Windows são "extended keys" — sem essa flag, o Windows
+    // as trata como as equivalentes do teclado numérico, e Shift+seta não estende seleção nenhuma.
+    private static readonly HashSet<ushort> ExtendedKeys =
+    [
+        NamedVirtualKeys.ByName["Up"], NamedVirtualKeys.ByName["Down"],
+        NamedVirtualKeys.ByName["Left"], NamedVirtualKeys.ByName["Right"],
+        NamedVirtualKeys.ByName["Home"], NamedVirtualKeys.ByName["End"],
+        NamedVirtualKeys.ByName["Delete"],
+        NamedVirtualKeys.ByName["WindowsL"], NamedVirtualKeys.ByName["WindowsR"],
+    ];
+
+    private static INPUT KeyInput(ushort virtualKeyCode, bool isKeyUp)
+    {
+        var flags = isKeyUp ? KEYEVENTF_KEYUP : 0;
+        if (ExtendedKeys.Contains(virtualKeyCode))
+            flags |= KEYEVENTF_EXTENDEDKEY;
+
+        return new INPUT
+        {
+            type = INPUT_KEYBOARD, U = new InputUnion { ki = new KEYBDINPUT { wVk = virtualKeyCode, dwFlags = flags } }
+        };
     }
 
     private static async Task TypeTextAsync(string text, CancellationToken cancellationToken)
@@ -155,7 +201,7 @@ public class WindowsInputPlayer : IInputPlayer
 
             SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<INPUT>());
 
-            await Task.Delay(InterCharacterDelayMs, cancellationToken);
+            await Task.Delay(KeyEventDelayMs, cancellationToken);
         }
     }
 }

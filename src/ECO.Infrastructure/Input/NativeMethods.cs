@@ -19,6 +19,7 @@ internal static class NativeMethods
     public const uint MOUSEEVENTF_LEFTDOWN = 0x0002;
     public const uint MOUSEEVENTF_LEFTUP = 0x0004;
 
+    public const uint KEYEVENTF_EXTENDEDKEY = 0x0001;
     public const uint KEYEVENTF_KEYUP = 0x0002;
     public const uint KEYEVENTF_UNICODE = 0x0004;
 
@@ -30,6 +31,10 @@ internal static class NativeMethods
     public const int WM_LBUTTONDOWN = 0x0201;
 
     public const uint MAPVK_VK_TO_VSC = 0;
+
+    public const int VK_SHIFT = 0x10;
+    public const int VK_CONTROL = 0x11;
+    public const int VK_MENU = 0x12; // Alt
 
     public delegate nint HookProc(int nCode, nint wParam, nint lParam);
 
