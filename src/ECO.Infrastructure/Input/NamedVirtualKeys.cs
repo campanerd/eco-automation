@@ -19,6 +19,8 @@ internal static class NamedVirtualKeys
         ("Right", 0x27),
         ("Home", 0x24),
         ("End", 0x23),
+        ("WindowsL", 0x5B), //Windows esquerda
+        ("WindowsR", 0x5C), //Windows direita
     ];
 
     public static readonly IReadOnlyDictionary<string, ushort> ByName =
