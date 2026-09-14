@@ -11,6 +11,11 @@ public class WindowsInputPlayer : IInputPlayer
 {
     private const int PauseCheckIntervalMs = 100;
 
+    // Sem essa pausa, as teclas de um texto longo saem rápido demais e o programa de destino
+    // (o Bloco de Notas novo do Windows 11, por exemplo) descarta parte delas silenciosamente —
+    // SendInput não avisa quando isso acontece, então o sintoma é texto cortado, sem erro nenhum.
+    private const int InterCharacterDelayMs = 15;
+
     private volatile bool _isPaused;
 
     public async Task PlayAsync(IReadOnlyList<MacroStep> steps, CancellationToken cancellationToken = default)
@@ -31,14 +36,14 @@ public class WindowsInputPlayer : IInputPlayer
                     break;
 
                 case TypeTextStep typeText:
-                    TypeText(typeText.Text);
+                    await TypeTextAsync(typeText.Text, cancellationToken);
                     break;
 
                 case TypeVariableTextStep typeVariableText:
                     // A substituição da variável (ex.: """dia_atual""") ainda não foi implementada —
                     // isso é responsabilidade do Application, antes de chegar até aqui. Por enquanto,
                     // o texto é digitado literalmente, igual ao TypeTextStep.
-                    TypeText(typeVariableText.Text);
+                    await TypeTextAsync(typeVariableText.Text, cancellationToken);
                     break;
 
                 case WaitStep wait:
@@ -117,7 +122,7 @@ public class WindowsInputPlayer : IInputPlayer
         SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<INPUT>());
     }
 
-    private static void TypeText(string text)
+    private static async Task TypeTextAsync(string text, CancellationToken cancellationToken)
     {
         foreach (var character in text)
         {
@@ -128,6 +133,8 @@ public class WindowsInputPlayer : IInputPlayer
             ];
 
             SendInput((uint)inputs.Length, inputs, Marshal.SizeOf<INPUT>());
+
+            await Task.Delay(InterCharacterDelayMs, cancellationToken);
         }
     }
 }
