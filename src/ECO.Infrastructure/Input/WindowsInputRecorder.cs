@@ -92,8 +92,10 @@ public class WindowsInputRecorder : IInputRecorder
         // O resto (letras, números, pontuação, espaço) vai se acumulando num buffer de texto,
         // em vez de virar um KeyPressStep por tecla — só quando uma tecla nomeada aparece,
         // ou a gravação para, esse buffer inteiro vira um único TypeTextStep.
+        // Caracteres de controle são descartados: combinações como Ctrl+R (o atalho que para a
+        // gravação) traduzem para um caractere invisível que não faz sentido dentro de um texto.
         var character = TranslateToChar(virtualKeyCode);
-        if (character is not null)
+        if (character is not null && !char.IsControl(character.Value))
             _textBuffer.Append(character.Value);
     }
 
