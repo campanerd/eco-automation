@@ -8,7 +8,7 @@ namespace ECO.Presentation.WPF;
 public partial class MainWindow : Window
 {
     private const uint VirtualKeyR = 0x52;
-    private const uint VirtualKeyPause = 0x13;
+    private const uint VirtualKeyP = 0x50;
 
     private readonly MainWindowViewModel _viewModel;
 
@@ -37,7 +37,7 @@ public partial class MainWindow : Window
                 this,
                 id: 2,
                 GlobalHotkey.ModControl | GlobalHotkey.ModAlt,
-                VirtualKeyPause,
+                VirtualKeyP,
                 _viewModel.TogglePause);
 
             if (!_stopRecordingHotkey.IsRegistered)
@@ -45,7 +45,7 @@ public partial class MainWindow : Window
                     "Atenção: não consegui registrar Ctrl+Alt+R (outro programa já usa esse atalho).";
             else if (!_togglePauseHotkey.IsRegistered)
                 viewModel.StatusMessage =
-                    "Atenção: não consegui registrar Ctrl+Alt+Pause (outro programa já usa esse atalho).";
+                    "Atenção: não consegui registrar Ctrl+Alt+P (outro programa já usa esse atalho).";
 
             await viewModel.LoadMacrosCommand.ExecuteAsync(null);
         };

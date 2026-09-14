@@ -98,7 +98,7 @@ public partial class MainWindowViewModel(
 
         IsPlaying = true;
         IsPaused = false;
-        StatusMessage = $"Reproduzindo \"{macroName}\"... Ctrl+Alt+Pause pausa e retoma.";
+        StatusMessage = $"Reproduzindo \"{macroName}\"... Ctrl+Alt+P pausa e retoma.";
 
         try
         {
@@ -121,7 +121,7 @@ public partial class MainWindowViewModel(
 
     private bool CanPlayMacro() => SelectedMacro is not null && !IsPlaying && !IsRecording;
 
-    // Chamado pelo atalho global Ctrl+Alt+Pause enquanto uma macro está rodando.
+    // Chamado pelo atalho global Ctrl+Alt+P enquanto uma macro está rodando.
     public void TogglePause()
     {
         if (!IsPlaying)
@@ -137,7 +137,7 @@ public partial class MainWindowViewModel(
 
         pauseResumeMacroUseCase.Pause();
         IsPaused = true;
-        StatusMessage = "Pausado — aperte Ctrl+Alt+Pause para retomar.";
+        StatusMessage = "Pausado — aperte Ctrl+Alt+P para retomar.";
     }
 }
 
