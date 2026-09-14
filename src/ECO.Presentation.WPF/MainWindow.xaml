@@ -38,12 +38,18 @@
         <StackPanel DockPanel.Dock="Bottom"
                     Orientation="Horizontal"
                     Margin="0,12,0,0">
+            <Button Content="Reproduzir macro selecionada"
+                    Command="{Binding PlayMacroCommand}"
+                    Padding="12,6" />
+
             <Button Content="Atualizar lista"
                     Command="{Binding LoadMacrosCommand}"
-                    Padding="12,6" />
+                    Padding="12,6"
+                    Margin="8,0,0,0" />
         </StackPanel>
 
-        <ListView ItemsSource="{Binding Macros}">
+        <ListView ItemsSource="{Binding Macros}"
+                  SelectedItem="{Binding SelectedMacro}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Id" Width="60" DisplayMemberBinding="{Binding Id}" />

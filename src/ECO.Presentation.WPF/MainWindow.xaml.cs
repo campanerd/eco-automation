@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Windows;
-
 using ECO.Presentation.WPF.ViewModels;
 
 namespace ECO.Presentation.WPF;
@@ -8,10 +7,12 @@ namespace ECO.Presentation.WPF;
 public partial class MainWindow : Window
 {
     private const uint VirtualKeyR = 0x52;
+    private const uint VirtualKeyPause = 0x13;
 
     private readonly MainWindowViewModel _viewModel;
 
     private GlobalHotkey? _stopRecordingHotkey;
+    private GlobalHotkey? _togglePauseHotkey;
 
     public MainWindow(MainWindowViewModel viewModel)
     {
@@ -31,23 +32,36 @@ public partial class MainWindow : Window
                 VirtualKeyR,
                 () => _viewModel.StopRecordingCommand.Execute(null));
 
+            _togglePauseHotkey = new GlobalHotkey(
+                this,
+                id: 2,
+                GlobalHotkey.ModControl | GlobalHotkey.ModAlt,
+                VirtualKeyPause,
+                _viewModel.TogglePause);
+
             if (!_stopRecordingHotkey.IsRegistered)
                 viewModel.StatusMessage = "Atenção: não consegui registrar Ctrl+Alt+R (outro programa já usa esse atalho).";
+            else if (!_togglePauseHotkey.IsRegistered)
+                viewModel.StatusMessage = "Atenção: não consegui registrar Ctrl+Alt+Pause (outro programa já usa esse atalho).";
 
             await viewModel.LoadMacrosCommand.ExecuteAsync(null);
         };
 
-        Closed += (_, _) => _stopRecordingHotkey?.Dispose();
+        Closed += (_, _) =>
+        {
+            _stopRecordingHotkey?.Dispose();
+            _togglePauseHotkey?.Dispose();
+        };
     }
 
-    // A janela some da tela durante a gravação: se ela ficasse visível, qualquer clique nela
-    // (inclusive num botão de parar) entraria na macro como um passo gravado.
+    // A janela sai da frente durante gravação e reprodução: se ficasse visível, um clique nela
+    // entraria na macro como passo gravado, e na reprodução ela taparia o programa alvo.
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName != nameof(MainWindowViewModel.IsRecording))
+        if (e.PropertyName is not (nameof(MainWindowViewModel.IsRecording) or nameof(MainWindowViewModel.IsPlaying)))
             return;
 
-        if (_viewModel.IsRecording)
+        if (_viewModel.IsRecording || _viewModel.IsPlaying)
         {
             WindowState = WindowState.Minimized;
             return;
